@@ -37,6 +37,11 @@ public class DemoActivity extends MultiPickerWrapperAppCompatActivity {
     String filePath;
     boolean isVideo = false;
 
+    @Override
+    protected MultiPickerWrapper.PickerUtilListener getMultiPickerWrapperListener() {
+        return multiPickerWrapperListener;
+    }
+
     MultiPickerWrapper.PickerUtilListener multiPickerWrapperListener = new MultiPickerWrapper.PickerUtilListener() {
         @Override
         public void onPermissionDenied() {
@@ -97,11 +102,6 @@ public class DemoActivity extends MultiPickerWrapperAppCompatActivity {
             Toast.makeText(context, s, Toast.LENGTH_SHORT).show();
         }
     };
-
-    @Override
-    protected MultiPickerWrapper.PickerUtilListener getMultiPickerWrapperListener() {
-        return multiPickerWrapperListener;
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
