@@ -14,7 +14,16 @@ The Activity must extend MultiPickerWrapperAppCompatActivity:
 
 ```java
 public class DemoActivity extends MultiPickerWrapperAppCompatActivity {
+    // example method to pick multiple image
+    private void pickMultipleImage() {
+        multiPickerWrapper.getPermissionAndPickMultipleImage();
+    }
 
+    @Override
+    protected MultiPickerWrapper.PickerUtilListener getMultiPickerWrapperListener() {
+        return multiPickerWrapperListener;
+    }
+    
     MultiPickerWrapper.PickerUtilListener multiPickerWrapperListener = new MultiPickerWrapper.PickerUtilListener() {
         @Override
         public void onPermissionDenied() {
@@ -41,16 +50,6 @@ public class DemoActivity extends MultiPickerWrapperAppCompatActivity {
             Toast.makeText(context, s, Toast.LENGTH_SHORT).show();
         }
     };
-
-    @Override
-    protected MultiPickerWrapper.PickerUtilListener getMultiPickerWrapperListener() {
-        return multiPickerWrapperListener;
-    }
-    
-    // example method to pick multiple image
-    private void pickMultipleImage() {
-        multiPickerWrapper.getPermissionAndPickMultipleImage();
-    }
     
     // rest of the activity code...
     
@@ -108,6 +107,15 @@ Similarly, the Fragment or SupportFragment must extend MultiPickerWrapperFragmen
 
 ```java
 public class DemoSupportFragment extends MultiPickerWrapperSupportFragment {
+    // example method to record video
+    private void recordVideo() {
+        multiPickerWrapper.getPermissionAndTakeVideo();
+    }
+
+    @Override
+    protected MultiPickerWrapper.PickerUtilListener getMultiPickerWrapperListener() {
+        return multiPickerWrapperListener;
+    }
 
     MultiPickerWrapper.PickerUtilListener multiPickerWrapperListener = new MultiPickerWrapper.PickerUtilListener() {
         @Override
@@ -135,16 +143,6 @@ public class DemoSupportFragment extends MultiPickerWrapperSupportFragment {
             Toast.makeText(context, s, Toast.LENGTH_SHORT).show();
         }
     };
-
-    @Override
-    protected MultiPickerWrapper.PickerUtilListener getMultiPickerWrapperListener() {
-        return multiPickerWrapperListener;
-    }
-    
-    // example method to record video
-    private void recordVideo() {
-        multiPickerWrapper.getPermissionAndTakeVideo();
-    }
     
     // rest of the fragment code
     
