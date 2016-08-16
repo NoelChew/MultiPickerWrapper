@@ -76,7 +76,7 @@ public class DemoFragment extends MultiPickerWrapperFragment {
         public void onVideosChosen(List<ChosenVideo> list) {
             final Uri uri = Uri.fromFile(new File(list.get(0).getOriginalPath()));
             filePath = list.get(0).getOriginalPath();
-            tvData.setText(filePath);
+            tvData.setText(getString(R.string.show_data) + filePath);
             isVideo = true;
             MaterialDialog.Builder builder = new MaterialDialog.Builder(context);
             builder.title("Video Selected:")
