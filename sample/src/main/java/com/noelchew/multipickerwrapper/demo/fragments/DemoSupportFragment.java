@@ -42,6 +42,11 @@ public class DemoSupportFragment extends MultiPickerWrapperSupportFragment {
     String filePath;
     boolean isVideo = false;
 
+    @Override
+    protected MultiPickerWrapper.PickerUtilListener getMultiPickerWrapperListener() {
+        return multiPickerWrapperListener;
+    }
+
     MultiPickerWrapper.PickerUtilListener multiPickerWrapperListener = new MultiPickerWrapper.PickerUtilListener() {
         @Override
         public void onPermissionDenied() {
@@ -102,11 +107,6 @@ public class DemoSupportFragment extends MultiPickerWrapperSupportFragment {
             Toast.makeText(context, s, Toast.LENGTH_SHORT).show();
         }
     };
-
-    @Override
-    protected MultiPickerWrapper.PickerUtilListener getMultiPickerWrapperListener() {
-        return multiPickerWrapperListener;
-    }
 
     @Nullable
     @Override
