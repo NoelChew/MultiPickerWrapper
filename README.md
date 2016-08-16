@@ -6,8 +6,12 @@ Integrated with Runtime Permission library [PermisoWrapper](https://github.com/N
 
 PermisoWrapper provides convenient methods to handle permission request. It is a wrapper around the fantastic [Permiso](https://github.com/greysonp/permiso) library.
 
-## How to Use
-For AppCompatActivity:
+Currently, this wrapper only supports image and video picking (and capturing).
+
+# How to Use
+## Activity
+The Activity must extend MultiPickerWrapperAppCompatActivity:
+
 ```java
 public class DemoActivity extends MultiPickerWrapperAppCompatActivity {
 
@@ -43,13 +47,27 @@ public class DemoActivity extends MultiPickerWrapperAppCompatActivity {
         return multiPickerWrapperListener;
     }
     
+    // example method to pick multiple image
+    private void pickMultipleImage() {
+        multiPickerWrapper.getPermissionAndPickMultipleImage();
+    }
+    
     // rest of the activity code...
     
 }
 
 ```
 
-For Fragment of SupportFragment, the activity must extend PermisoActivity or override the following methods:
+## Fragment or SupportFragment
+For Fragment or SupportFragment, the Activity containing the fragment must extend PermisoActivity:
+
+```java
+public class DemoSupportFragmentActivity extends PermisoActivity {
+    // activity code here
+}
+```
+
+or override the following methods in Activity:
 
 ```java
 // This example is not extending PermisoActivity on purpose. Look out for comments surrounded by *
@@ -86,7 +104,7 @@ public class DemoSupportFragmentActivity extends AppCompatActivity {
 }
 ```
 
-In Fragment or SupportFragment:
+Similarly, the Fragment or SupportFragment must extend MultiPickerWrapperFragment or MultiPickerWrapperSupportFragment:
 
 ```java
 public class DemoSupportFragment extends MultiPickerWrapperSupportFragment {
@@ -121,6 +139,11 @@ public class DemoSupportFragment extends MultiPickerWrapperSupportFragment {
     @Override
     protected MultiPickerWrapper.PickerUtilListener getMultiPickerWrapperListener() {
         return multiPickerWrapperListener;
+    }
+    
+    // example method to record video
+    private void recordVideo() {
+        multiPickerWrapper.getPermissionAndTakeVideo();
     }
     
     // rest of the fragment code
