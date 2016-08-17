@@ -148,7 +148,13 @@ public class DemoSupportFragment extends MultiPickerWrapperSupportFragment {
     
 }
 ```
-
+## List of Predefined Methods
+- getPermissionAndPickSingleImage()
+- getPermissionAndPickMultipleImage()
+- getPermissionAndTakePicture()
+- getPermissionAndPickSingleVideo()
+- getPermissionAndTakeVideo()
+- getPermissionAndTakeVideoWithDurationLimit()
 
 ## Integration
 This library is hosted by jitpack.io.
