@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.Fragment;
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 
@@ -18,13 +19,21 @@ import com.kbeanie.multipicker.api.callbacks.VideoPickerCallback;
 import com.kbeanie.multipicker.api.entity.ChosenImage;
 import com.kbeanie.multipicker.api.entity.ChosenVideo;
 import com.noelchew.permisowrapper.PermisoWrapper;
+import com.yalantis.ucrop.UCrop;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
  * Created by noelchew on 15/08/2016.
  */
 public class MultiPickerWrapper {
+
+    public static final int UCROP_PICKER_REQUEST = 2201;
+    public static final int UCROP_CAMERA_REQUEST = 2202;
+
     private ImagePicker imagePicker;
     private VideoPicker videoPicker;
     private CameraImagePicker cameraImagePicker;
@@ -37,6 +46,14 @@ public class MultiPickerWrapper {
     private Fragment fragment;
     private _CacheLocation cacheLocation;
 
+    // true if user chooses to crop image from gallery;
+    // false if user chooses to crop image taken from camera
+    private boolean isUCropPicker = true;
+
+    private UCrop.Options uCropOptions;
+    private boolean setAspectRatio = false;
+    private float aspectRatioWidth = 1;
+    private float aspectRatioHeight = 1;
     private int videoDurationLimit = 15;
 
     public MultiPickerWrapper(Activity activity, _CacheLocation cacheLocation) {
@@ -93,12 +110,44 @@ public class MultiPickerWrapper {
         PermisoWrapper.getPermissionPickPictureVideo(context, pickSinglePicturePermissionListener);
     }
 
+    public void getPermissionAndPickSingleImageAndCrop(UCrop.Options uCropOptions) {
+        this.isUCropPicker = true;
+        this.setAspectRatio = false;
+        this.uCropOptions = uCropOptions;
+        PermisoWrapper.getPermissionPickPictureVideo(context, pickSinglePictureAndCropPermissionListener);
+    }
+
+    public void getPermissionAndPickSingleImageAndCrop(UCrop.Options uCropOptions, float aspectRatioWidth, float aspectRatioHeight) {
+        this.isUCropPicker = true;
+        this.setAspectRatio = true;
+        this.aspectRatioWidth = aspectRatioWidth;
+        this.aspectRatioHeight = aspectRatioHeight;
+        this.uCropOptions = uCropOptions;
+        PermisoWrapper.getPermissionPickPictureVideo(context, pickSinglePictureAndCropPermissionListener);
+    }
+
     public void getPermissionAndPickMultipleImage() {
         PermisoWrapper.getPermissionPickPictureVideo(context, pickMultiplePicturePermissionListener);
     }
 
     public void getPermissionAndTakePicture() {
         PermisoWrapper.getPermissionTakePicture(context, takePicturePermissionListener);
+    }
+
+    public void getPermissionAndTakePictureAndCrop(UCrop.Options uCropOptions) {
+        this.isUCropPicker = false;
+        this.setAspectRatio = false;
+        this.uCropOptions = uCropOptions;
+        PermisoWrapper.getPermissionTakePicture(context, takePictureAndCropPermissionListener);
+    }
+
+    public void getPermissionAndTakePictureAndCrop(UCrop.Options uCropOptions, float aspectRatioWidth, float aspectRatioHeight) {
+        this.isUCropPicker = false;
+        this.setAspectRatio = true;
+        this.aspectRatioWidth = aspectRatioWidth;
+        this.aspectRatioHeight = aspectRatioHeight;
+        this.uCropOptions = uCropOptions;
+        PermisoWrapper.getPermissionTakePicture(context, takePictureAndCropPermissionListener);
     }
 
     public void getPermissionAndPickSingleVideo() {
@@ -122,6 +171,14 @@ public class MultiPickerWrapper {
         imagePicker.pickImage();
     }
 
+    private void pickSingleImageAndCrop() {
+        imagePicker.shouldGenerateMetadata(false);
+        imagePicker.shouldGenerateThumbnails(false);
+        imagePicker.setCacheLocation(cacheLocation.getValue());
+        imagePicker.setImagePickerCallback(imagePickerCallbackWithCrop);
+        imagePicker.pickImage();
+    }
+
     private void pickMultipleImage() {
         imagePicker.allowMultiple();
         imagePicker.shouldGenerateMetadata(false);
@@ -136,6 +193,14 @@ public class MultiPickerWrapper {
         cameraImagePicker.shouldGenerateThumbnails(false);
         cameraImagePicker.setCacheLocation(cacheLocation.getValue());
         cameraImagePicker.setImagePickerCallback(imagePickerCallback);
+        pickerPath = cameraImagePicker.pickImage();
+    }
+
+    private void takePictureAndCrop() {
+        cameraImagePicker.shouldGenerateMetadata(false);
+        cameraImagePicker.shouldGenerateThumbnails(false);
+        cameraImagePicker.setCacheLocation(cacheLocation.getValue());
+        cameraImagePicker.setImagePickerCallback(imagePickerCallbackWithCrop);
         pickerPath = cameraImagePicker.pickImage();
     }
 
@@ -235,6 +300,45 @@ public class MultiPickerWrapper {
                     cameraVideoPicker.submit(data);
                 }
                 return true;
+
+            case UCROP_PICKER_REQUEST:
+                if (resultCode == Activity.RESULT_OK) {
+                    if (imagePicker == null) {
+                        if (activity != null) {
+                            imagePicker = new ImagePicker(activity);
+                        } else if (supportFragment != null) {
+                            imagePicker = new ImagePicker(supportFragment);
+                        } else if (fragment != null) {
+                            imagePicker = new ImagePicker(fragment);
+                        }
+                    }
+                    imagePicker.setImagePickerCallback(imagePickerCallback);
+                    Uri uri = UCrop.getOutput(data);
+                    Intent intentData = new Intent();
+                    intentData.putExtra("uris", new ArrayList(Arrays.asList(uri)));
+                    imagePicker.submit(intentData);
+                }
+                return true;
+
+            case UCROP_CAMERA_REQUEST:
+                if (resultCode == Activity.RESULT_OK) {
+                    if (cameraImagePicker == null) {
+                        if (activity != null) {
+                            cameraImagePicker = new CameraImagePicker(activity);
+                        } else if (supportFragment != null) {
+                            cameraImagePicker = new CameraImagePicker(supportFragment);
+                        } else if (fragment != null) {
+                            cameraImagePicker = new CameraImagePicker(fragment);
+                        }
+                    }
+                    cameraImagePicker.reinitialize(pickerPath);
+                    cameraImagePicker.setImagePickerCallback(imagePickerCallback);
+                    Uri uri = UCrop.getOutput(data);
+                    Intent intentData = new Intent();
+                    intentData.putExtra("uris", new ArrayList(Arrays.asList(uri)));
+                    cameraImagePicker.submit(intentData);
+                }
+                return true;
         }
         return false;
     }
@@ -248,6 +352,58 @@ public class MultiPickerWrapper {
                 throw new RuntimeException("PickerUtilListener is not set.");
             }
             pickerUtilListener.onImagesChosen(list);
+        }
+
+        @Override
+        public void onError(String s) {
+            if (pickerUtilListener == null) {
+                throw new RuntimeException("PickerUtilListener is not set.");
+            }
+            pickerUtilListener.onError(s);
+        }
+    };
+
+    private ImagePickerCallback imagePickerCallbackWithCrop = new ImagePickerCallback() {
+        @Override
+        public void onImagesChosen(List<ChosenImage> list) {
+            if (pickerUtilListener == null) {
+                throw new RuntimeException("PickerUtilListener is not set.");
+            }
+
+            // assume only one image is picked/taken
+            if (list.isEmpty()) {
+                pickerUtilListener.onImagesChosen(list);
+            } else {
+                File imageFile = new File(list.get(0).getOriginalPath());
+                Uri sourceUri = Uri.fromFile(imageFile);
+//                String fileName = imageFile.getName();
+//                String tmp[] = fileName.split("\\.");
+//                String fileNameWithoutExtension = fileName.replace("." + tmp[tmp.length - 1], "");
+//                String destinationFilePath = imageFile.getParentFile().getAbsolutePath() + "/" + fileNameWithoutExtension + "_cropped" + "." + tmp[tmp.length - 1];
+//                Uri destinationUri = Uri.fromFile(new File(destinationFilePath));
+//                UCrop uCrop = UCrop.of(sourceUri, destinationUri)
+                UCrop uCrop = UCrop.of(sourceUri, sourceUri)
+                        .withOptions(uCropOptions);
+
+                if (setAspectRatio) {
+                    uCrop.withAspectRatio(aspectRatioWidth, aspectRatioHeight);
+                }
+
+                int requestCode;
+                if (isUCropPicker) {
+                    requestCode = UCROP_PICKER_REQUEST;
+                } else {
+                    requestCode = UCROP_CAMERA_REQUEST;
+                }
+
+                if (activity != null) {
+                    uCrop.start(activity, requestCode);
+                } else if (fragment != null) {
+                    uCrop.start(fragment.getActivity(), fragment, requestCode);
+                } else if (supportFragment != null) {
+                    uCrop.start(supportFragment.getActivity(), supportFragment, requestCode);
+                }
+            }
         }
 
         @Override
@@ -295,6 +451,21 @@ public class MultiPickerWrapper {
         }
     };
 
+    private PermisoWrapper.PermissionListener pickSinglePictureAndCropPermissionListener = new PermisoWrapper.PermissionListener() {
+        @Override
+        public void onPermissionGranted() {
+            pickSingleImageAndCrop();
+        }
+
+        @Override
+        public void onPermissionDenied() {
+            if (pickerUtilListener == null) {
+                throw new RuntimeException("PickerUtilListener is not set.");
+            }
+            pickerUtilListener.onPermissionDenied();
+        }
+    };
+
     private PermisoWrapper.PermissionListener pickMultiplePicturePermissionListener = new PermisoWrapper.PermissionListener() {
         @Override
         public void onPermissionGranted() {
@@ -315,6 +486,22 @@ public class MultiPickerWrapper {
         @Override
         public void onPermissionGranted() {
             takePicture();
+        }
+
+        @Override
+        public void onPermissionDenied() {
+            if (pickerUtilListener == null) {
+                throw new RuntimeException("PickerUtilListener is not set.");
+            }
+            pickerUtilListener.onPermissionDenied();
+        }
+
+    };
+
+    private PermisoWrapper.PermissionListener takePictureAndCropPermissionListener = new PermisoWrapper.PermissionListener() {
+        @Override
+        public void onPermissionGranted() {
+            takePictureAndCrop();
         }
 
         @Override
