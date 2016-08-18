@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.content.ContextCompat;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,9 +21,12 @@ import com.bumptech.glide.Glide;
 import com.kbeanie.multipicker.api.entity.ChosenImage;
 import com.kbeanie.multipicker.api.entity.ChosenVideo;
 import com.noelchew.multipickerwrapper.demo.R;
+import com.noelchew.multipickerwrapper.demo.utils.PixelUtil;
 import com.noelchew.multipickerwrapper.library.MultiPickerWrapper;
 import com.noelchew.multipickerwrapper.library.ui.MultiPickerWrapperFragment;
 import com.noelchew.permisowrapper.PermisoWrapper;
+import com.yalantis.ucrop.UCrop;
+import com.yalantis.ucrop.model.AspectRatio;
 
 import java.io.File;
 import java.util.List;
@@ -133,7 +137,7 @@ public class DemoFragment extends MultiPickerWrapperFragment {
             MaterialDialog.Builder builder = new MaterialDialog.Builder(context);
             builder.title("Image or Video")
                     .content("Do you want to select image or video?")
-                    .items("Image", "Video")
+                    .items("Image", "Crop Image", "Video")
                     .itemsCallback(new MaterialDialog.ListCallback() {
                         @Override
                         public void onSelection(MaterialDialog dialog, View itemView, int which, CharSequence text) {
@@ -158,7 +162,44 @@ public class DemoFragment extends MultiPickerWrapperFragment {
                                                 }
                                             }
                                         }).show();
-                            } else if (which == 1) {
+                            } if (which == 1) {
+                                MaterialDialog.Builder builder = new MaterialDialog.Builder(context);
+                                builder.title("Crop Image")
+                                        .content("Do you want to pick from Gallery or take with Camera?")
+                                        .items("Gallery", "Camera")
+                                        .itemsCallback(new MaterialDialog.ListCallback() {
+                                            @Override
+                                            public void onSelection(MaterialDialog dialog, View itemView, int which, CharSequence text) {
+                                                UCrop.Options options = new UCrop.Options();
+                                                options.setStatusBarColor(ContextCompat.getColor(context, R.color.colorPrimaryDark));
+                                                options.setToolbarColor(ContextCompat.getColor(context, R.color.colorPrimary));
+                                                options.setToolbarTitle("MultiPickerWrapper - Crop");
+
+                                                options.setCropFrameColor(ContextCompat.getColor(context, R.color.colorPrimaryDark));
+                                                options.setCropFrameStrokeWidth(PixelUtil.dpToPx(4));
+
+                                                options.setCropGridColor(ContextCompat.getColor(context, R.color.colorPrimary));
+                                                options.setCropGridStrokeWidth(PixelUtil.dpToPx(2));
+
+                                                options.setOvalDimmedLayer(true);
+
+                                                options.setActiveWidgetColor(ContextCompat.getColor(context, R.color.colorPrimary));
+                                                options.setAspectRatioOptions(0, new AspectRatio[]{new AspectRatio("Profile Picture", 1, 1), new AspectRatio("Cover Picture", 16, 9)});
+
+                                                switch (which) {
+                                                    case 0:
+                                                        // choose image from gallery
+                                                        multiPickerWrapper.getPermissionAndPickSingleImageAndCrop(options, 1, 1);
+                                                        break;
+
+                                                    case 1:
+                                                        // take image with camera
+                                                        multiPickerWrapper.getPermissionAndTakePictureAndCrop(options, 1, 1);
+                                                        break;
+                                                }
+                                            }
+                                        }).show();
+                            } else if (which == 2) {
                                 MaterialDialog.Builder builder = new MaterialDialog.Builder(context);
                                 builder.title("Video")
                                         .content("Do you want to pick from Gallery or record with Camera?")
