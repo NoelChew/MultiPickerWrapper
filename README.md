@@ -3,7 +3,7 @@
 
 - pick single or multiple image/video
 - capture single image/video
-- crop image immediately after selection
+- crop image immediately after selection (optional)
 - library handles Runtime Permission
 - combination of the following libraries:
     -  [android-multipicker-library](https://github.com/coomar2841/android-multipicker-library) ([com.kbeanie:multipicker:1.1.1@aar](https://mvnrepository.com/artifact/com.kbeanie/multipicker/1.1.1))
