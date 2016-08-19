@@ -1,12 +1,14 @@
 # MultiPickerWrapper
 [![Release](https://jitpack.io/v/noelchew/MultiPickerWrapper.svg)](https://jitpack.io/#noelchew/MultiPickerWrapper)
 
-A combination of the following libraries:
-- [android-multipicker-library](https://github.com/coomar2841/android-multipicker-library) ([com.kbeanie:multipicker:1.1.1@aar](https://mvnrepository.com/artifact/com.kbeanie/multipicker/1.1.1))
-- [PermisoWrapper](https://github.com/NoelChew/PermisoWrapper) ([com.github.noelchew:PermisoWrapper:0.1.1](https://github.com/NoelChew/PermisoWrapper/releases/tag/0.1.1))
-- [UCrop](https://github.com/Yalantis/uCrop) ([com.yalantis:ucrop:2.1.2](https://mvnrepository.com/artifact/com.yalantis/ucrop/2.1.2))
-
-Currently, this library only supports picking and capturing of image (with cropping) and video.
+- pick single or multiple image/video
+- capture single image/video
+- crop image
+- library handles Runtime Permission
+- combination of the following libraries:
+    -  [android-multipicker-library](https://github.com/coomar2841/android-multipicker-library) ([com.kbeanie:multipicker:1.1.1@aar](https://mvnrepository.com/artifact/com.kbeanie/multipicker/1.1.1))
+    - [PermisoWrapper](https://github.com/NoelChew/PermisoWrapper) ([com.github.noelchew:PermisoWrapper:0.1.1](https://github.com/NoelChew/PermisoWrapper/releases/tag/0.1.1))
+    - [UCrop](https://github.com/Yalantis/uCrop) ([com.yalantis:ucrop:2.1.2](https://mvnrepository.com/artifact/com.yalantis/ucrop/2.1.2))
 
 # How to Use
 ## Activity
@@ -15,8 +17,22 @@ The Activity must extend MultiPickerWrapperAppCompatActivity:
 ```java
 public class DemoActivity extends MultiPickerWrapperAppCompatActivity {
     // example method to pick multiple image
-    private void pickMultipleImage() {
-        multiPickerWrapper.getPermissionAndPickMultipleImage();
+    private void pickCroppedImage() {
+        UCrop.Options options = new UCrop.Options();
+        options.setStatusBarColor(ContextCompat.getColor(context, R.color.colorPrimaryDark));
+        options.setToolbarColor(ContextCompat.getColor(context, R.color.colorPrimary));
+        options.setCropFrameColor(ContextCompat.getColor(context, R.color.colorPrimaryDark));
+        options.setCropFrameStrokeWidth(PixelUtil.dpToPx(4));
+        options.setCropGridColor(ContextCompat.getColor(context, R.color.colorPrimary));
+        options.setCropGridStrokeWidth(PixelUtil.dpToPx(2));
+        options.setActiveWidgetColor(ContextCompat.getColor(context, R.color.colorPrimary));
+        options.setToolbarTitle("MultiPickerWrapper - Crop");
+        
+        // set rounded cropping guide
+        options.setOvalDimmedLayer(true);
+        
+        // set aspectRatioWidth and Height of 1 -> gives square rounded image cropping
+        multiPickerWrapper.getPermissionAndPickSingleImageAndCrop(options, 1, 1);
     }
 
     @Override
