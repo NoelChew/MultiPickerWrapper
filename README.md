@@ -3,7 +3,7 @@
 
 - pick single or multiple image/video
 - capture single image/video
-- crop image
+- crop image immediately after selection
 - library handles Runtime Permission
 - combination of the following libraries:
     -  [android-multipicker-library](https://github.com/coomar2841/android-multipicker-library) ([com.kbeanie:multipicker:1.1.1@aar](https://mvnrepository.com/artifact/com.kbeanie/multipicker/1.1.1))
@@ -18,6 +18,8 @@ The Activity must extend MultiPickerWrapperAppCompatActivity:
 public class DemoActivity extends MultiPickerWrapperAppCompatActivity {
     // example method to pick multiple image
     private void pickCroppedImage() {
+    
+        // configure cropping activity UI to match current theme colour
         UCrop.Options options = new UCrop.Options();
         options.setStatusBarColor(ContextCompat.getColor(context, R.color.colorPrimaryDark));
         options.setToolbarColor(ContextCompat.getColor(context, R.color.colorPrimary));
@@ -190,7 +192,7 @@ allprojects {
 Application level gradle:
 ```
 dependencies {
-    compile 'com.github.noelchew:MultiPickerWrapper:0.1.0'
+    compile 'com.github.noelchew:MultiPickerWrapper:0.1.1'
 }
 ```
 Note: do not add the jitpack.io repository under buildscript
