@@ -15,3 +15,16 @@
 #-keepclassmembers class fqcn.of.javascript.interface.for.webview {
 #   public *;
 #}
+
+# UCrop
+-dontwarn com.yalantis.ucrop**
+-keep class com.yalantis.ucrop** { *; }
+-keep interface com.yalantis.ucrop** { *; }
+
+# OkHttp (included in UCrop library)
+-keepattributes Signature
+-keepattributes *Annotation*
+-keep class okhttp3.** { *; }
+-keep interface okhttp3.** { *; }
+-dontwarn okhttp3.**
+-dontwarn okio.**
