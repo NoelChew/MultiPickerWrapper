@@ -1,13 +1,12 @@
 # MultiPickerWrapper
 [![Release](https://jitpack.io/v/noelchew/MultiPickerWrapper.svg)](https://jitpack.io/#noelchew/MultiPickerWrapper)
 
-Wrapper around [android-multipicker-library](https://github.com/coomar2841/android-multipicker-library) ([com.kbeanie:multipicker:1.1.1@aar](https://mvnrepository.com/artifact/com.kbeanie/multipicker/1.1.1))
+A combination of the following libraries:
+- [android-multipicker-library](https://github.com/coomar2841/android-multipicker-library) ([com.kbeanie:multipicker:1.1.1@aar](https://mvnrepository.com/artifact/com.kbeanie/multipicker/1.1.1))
+- [PermisoWrapper](https://github.com/NoelChew/PermisoWrapper) ([com.github.noelchew:PermisoWrapper:0.1.1](https://github.com/NoelChew/PermisoWrapper/releases/tag/0.1.1))
+- [UCrop](https://github.com/Yalantis/uCrop) ([com.yalantis:ucrop:2.1.2](https://mvnrepository.com/artifact/com.yalantis/ucrop/2.1.2))
 
-Integrated with Runtime Permission library [PermisoWrapper](https://github.com/NoelChew/PermisoWrapper)
-
-PermisoWrapper provides convenient methods to handle permission request. It is a wrapper around the fantastic [Permiso](https://github.com/greysonp/permiso) library.
-
-Currently, this wrapper only supports image and video picking (and capturing).
+Currently, this library only supports picking and capturing of image (with cropping) and video.
 
 # How to Use
 ## Activity
@@ -151,8 +150,10 @@ public class DemoSupportFragment extends MultiPickerWrapperSupportFragment {
 ```
 ## List of Predefined Methods
 - getPermissionAndPickSingleImage()
+- getPermissionAndPickSingleImageAndCrop()
 - getPermissionAndPickMultipleImage()
 - getPermissionAndTakePicture()
+- getPermissionAndTakePictureAndCrop()
 - getPermissionAndPickSingleVideo()
 - getPermissionAndTakeVideo()
 - getPermissionAndTakeVideoWithDurationLimit()
@@ -177,3 +178,20 @@ dependencies {
 }
 ```
 Note: do not add the jitpack.io repository under buildscript
+
+
+## Proguard
+```
+# UCrop
+-dontwarn com.yalantis.ucrop**
+-keep class com.yalantis.ucrop** { *; }
+-keep interface com.yalantis.ucrop** { *; }
+
+# OkHttp (included in UCrop library)
+-keepattributes Signature
+-keepattributes *Annotation*
+-keep class okhttp3.** { *; }
+-keep interface okhttp3.** { *; }
+-dontwarn okhttp3.**
+-dontwarn okio.**
+```
