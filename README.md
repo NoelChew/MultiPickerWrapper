@@ -10,6 +10,10 @@
     - [PermisoWrapper](https://github.com/NoelChew/PermisoWrapper) ([com.github.noelchew:PermisoWrapper:0.1.1](https://github.com/NoelChew/PermisoWrapper/releases/tag/0.1.1))
     - [UCrop](https://github.com/Yalantis/uCrop) ([com.yalantis:ucrop:2.1.2](https://mvnrepository.com/artifact/com.yalantis/ucrop/2.1.2))
 
+####Optionally allows user to crop image taken or selected.
+
+![screenshot1](https://github.com/NoelChew/MultiPickerWrapper/blob/master/screenshots/screenshot_1.png)
+
 # How to Use
 ## Activity
 The Activity must extend MultiPickerWrapperAppCompatActivity:
