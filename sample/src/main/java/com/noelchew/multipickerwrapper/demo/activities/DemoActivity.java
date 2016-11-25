@@ -1,6 +1,7 @@
 package com.noelchew.multipickerwrapper.demo.activities;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -14,7 +15,6 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.afollestad.materialdialogs.MaterialDialog;
 import com.bumptech.glide.Glide;
 import com.kbeanie.multipicker.api.entity.ChosenImage;
 import com.kbeanie.multipicker.api.entity.ChosenVideo;
@@ -22,10 +22,13 @@ import com.noelchew.multipickerwrapper.demo.R;
 import com.noelchew.multipickerwrapper.demo.utils.PixelUtil;
 import com.noelchew.multipickerwrapper.library.MultiPickerWrapper;
 import com.noelchew.multipickerwrapper.library.ui.MultiPickerWrapperAppCompatActivity;
+import com.noelchew.ncutils.AlertDialogUtil;
 import com.noelchew.permisowrapper.PermisoWrapper;
 import com.yalantis.ucrop.UCrop;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class DemoActivity extends MultiPickerWrapperAppCompatActivity {
@@ -57,13 +60,12 @@ public class DemoActivity extends MultiPickerWrapperAppCompatActivity {
             filePath = list.get(0).getOriginalPath();
             tvData.setText(getString(R.string.show_data) + filePath);
             isVideo = false;
-            MaterialDialog.Builder builder = new MaterialDialog.Builder(context);
-            builder.title("Image Selected:")
-                    .content(list.get(0).getOriginalPath())
-                    .items("Show", "Cancel")
-                    .itemsCallback(new MaterialDialog.ListCallback() {
+            AlertDialogUtil.showAlertDialogWithSelections(context,
+                    "Image Selected:",
+                    new ArrayList<>(Arrays.asList(new String[]{"Show", "Cancel"})),
+                    new DialogInterface.OnClickListener() {
                         @Override
-                        public void onSelection(MaterialDialog dialog, View itemView, int which, CharSequence text) {
+                        public void onClick(DialogInterface dialog, int which) {
                             if (which == 0) {
                                 Intent intent = new Intent();
                                 intent.setAction(Intent.ACTION_VIEW);
@@ -71,7 +73,8 @@ public class DemoActivity extends MultiPickerWrapperAppCompatActivity {
                                 startActivity(intent);
                             }
                         }
-                    }).show();
+                    });
+
             Glide.with(context).load(uri).into(imageView);
         }
 
@@ -81,13 +84,12 @@ public class DemoActivity extends MultiPickerWrapperAppCompatActivity {
             filePath = list.get(0).getOriginalPath();
             tvData.setText(getString(R.string.show_data) + filePath);
             isVideo = true;
-            MaterialDialog.Builder builder = new MaterialDialog.Builder(context);
-            builder.title("Video Selected:")
-                    .content(list.get(0).getOriginalPath())
-                    .items("Show", "Cancel")
-                    .itemsCallback(new MaterialDialog.ListCallback() {
+            AlertDialogUtil.showAlertDialogWithSelections(context,
+                    "Video Selected:",
+                    new ArrayList<>(Arrays.asList(new String[]{"Show", "Cancel"})),
+                    new DialogInterface.OnClickListener() {
                         @Override
-                        public void onSelection(MaterialDialog dialog, View itemView, int which, CharSequence text) {
+                        public void onClick(DialogInterface dialog, int which) {
                             if (which == 0) {
                                 Intent intent = new Intent();
                                 intent.setAction(Intent.ACTION_VIEW);
@@ -95,7 +97,7 @@ public class DemoActivity extends MultiPickerWrapperAppCompatActivity {
                                 startActivity(intent);
                             }
                         }
-                    }).show();
+                    });
 
             Glide.with(context).load(list.get(0).getPreviewThumbnail()).into(imageView);
         }
@@ -138,21 +140,20 @@ public class DemoActivity extends MultiPickerWrapperAppCompatActivity {
     private View.OnClickListener relativeLayoutImageOnClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            MaterialDialog.Builder builder = new MaterialDialog.Builder(context);
-            builder.title("Image or Video")
-                    .content("Do you want to select image or video?")
-                    .items("Image", "Image + Crop", "Video")
-                    .itemsCallback(new MaterialDialog.ListCallback() {
+
+            AlertDialogUtil.showAlertDialogWithSelections(context,
+                    "Do you want to select image or video?",
+                    new ArrayList<>(Arrays.asList(new String[]{"Image", "Image + Crop", "Video"})),
+                    new DialogInterface.OnClickListener() {
                         @Override
-                        public void onSelection(MaterialDialog dialog, View itemView, int which, CharSequence text) {
+                        public void onClick(DialogInterface dialog, int which) {
                             if (which == 0) {
-                                MaterialDialog.Builder builder = new MaterialDialog.Builder(context);
-                                builder.title("Image")
-                                        .content("Do you want to pick from Gallery or take with Camera?")
-                                        .items("Gallery", "Camera")
-                                        .itemsCallback(new MaterialDialog.ListCallback() {
+                                AlertDialogUtil.showAlertDialogWithSelections(context,
+                                        "Image",
+                                        new ArrayList<>(Arrays.asList(new String[]{"Gallery", "Camera"})),
+                                        new DialogInterface.OnClickListener() {
                                             @Override
-                                            public void onSelection(MaterialDialog dialog, View itemView, int which, CharSequence text) {
+                                            public void onClick(DialogInterface dialog, int which) {
                                                 switch (which) {
                                                     case 0:
                                                         // choose image from gallery
@@ -165,15 +166,15 @@ public class DemoActivity extends MultiPickerWrapperAppCompatActivity {
                                                         break;
                                                 }
                                             }
-                                        }).show();
-                            } if (which == 1) {
-                                MaterialDialog.Builder builder = new MaterialDialog.Builder(context);
-                                builder.title("Crop Image")
-                                        .content("Do you want to pick from Gallery or take with Camera?")
-                                        .items("Gallery", "Camera")
-                                        .itemsCallback(new MaterialDialog.ListCallback() {
+                                        });
+                            }
+                            if (which == 1) {
+                                AlertDialogUtil.showAlertDialogWithSelections(context,
+                                        "Crop Image",
+                                        new ArrayList<>(Arrays.asList(new String[]{"Gallery", "Camera"})),
+                                        new DialogInterface.OnClickListener() {
                                             @Override
-                                            public void onSelection(MaterialDialog dialog, View itemView, int which, CharSequence text) {
+                                            public void onClick(DialogInterface dialog, int which) {
                                                 UCrop.Options options = new UCrop.Options();
                                                 options.setStatusBarColor(ContextCompat.getColor(context, R.color.colorPrimaryDark));
                                                 options.setToolbarColor(ContextCompat.getColor(context, R.color.colorPrimary));
@@ -185,7 +186,7 @@ public class DemoActivity extends MultiPickerWrapperAppCompatActivity {
                                                 options.setCropGridColor(ContextCompat.getColor(context, R.color.colorPrimary));
                                                 options.setCropGridStrokeWidth(PixelUtil.dpToPx(2));
 
-                                                options.setOvalDimmedLayer(true);
+                                                options.setCircleDimmedLayer(true);
 
                                                 options.setActiveWidgetColor(ContextCompat.getColor(context, R.color.colorPrimary));
 //                                                options.setAspectRatioOptions(0, new AspectRatio[]{new AspectRatio("Profile Picture", 1, 1), new AspectRatio("Cover Picture", 16, 9)});
@@ -202,15 +203,14 @@ public class DemoActivity extends MultiPickerWrapperAppCompatActivity {
                                                         break;
                                                 }
                                             }
-                                        }).show();
+                                        });
                             } else if (which == 2) {
-                                MaterialDialog.Builder builder = new MaterialDialog.Builder(context);
-                                builder.title("Video")
-                                        .content("Do you want to pick from Gallery or record with Camera?")
-                                        .items("Gallery", "Camera")
-                                        .itemsCallback(new MaterialDialog.ListCallback() {
+                                AlertDialogUtil.showAlertDialogWithSelections(context,
+                                        "Video",
+                                        new ArrayList<>(Arrays.asList(new String[]{"Gallery", "Camera"})),
+                                        new DialogInterface.OnClickListener() {
                                             @Override
-                                            public void onSelection(MaterialDialog dialog, View itemView, int which, CharSequence text) {
+                                            public void onClick(DialogInterface dialog, int which) {
                                                 switch (which) {
                                                     case 0:
                                                         // choose video from gallery
@@ -223,10 +223,10 @@ public class DemoActivity extends MultiPickerWrapperAppCompatActivity {
                                                         break;
                                                 }
                                             }
-                                        }).show();
+                                        });
                             }
                         }
-                    }).show();
+                    });
         }
     };
 
@@ -250,7 +250,7 @@ public class DemoActivity extends MultiPickerWrapperAppCompatActivity {
         }
     };
 
-    private View.OnClickListener btnCheckPermissionsOnClickListener  = new View.OnClickListener() {
+    private View.OnClickListener btnCheckPermissionsOnClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
             PermisoWrapper.startInstalledAppDetailsActivity(context);

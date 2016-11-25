@@ -15,7 +15,8 @@ public abstract class MultiPickerWrapperFragment extends Fragment {
 
     // override this optionally
     protected MultiPickerWrapper._CacheLocation getCacheLocation() {
-        return MultiPickerWrapper._CacheLocation.EXTERNAL_STORAGE_APP_DIR;
+        // warning: setting this to internal app directory means only this app can access the file
+        return MultiPickerWrapper._CacheLocation.EXTERNAL_CACHE_DIR;
     }
 
     @Override
