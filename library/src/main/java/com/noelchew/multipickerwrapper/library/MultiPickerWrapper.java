@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.util.Log;
 
 import com.kbeanie.multipicker.api.CacheLocation;
 import com.kbeanie.multipicker.api.CameraImagePicker;
@@ -30,6 +31,8 @@ import java.util.List;
  * Created by noelchew on 15/08/2016.
  */
 public class MultiPickerWrapper {
+
+    public static final String TAG = "MultiPickerWrapper";
 
     public static final int UCROP_PICKER_REQUEST = 2201;
     public static final int UCROP_CAMERA_REQUEST = 2202;
@@ -67,7 +70,7 @@ public class MultiPickerWrapper {
     }
 
     public MultiPickerWrapper(Activity activity) {
-        this(activity, _CacheLocation.EXTERNAL_STORAGE_APP_DIR);
+        this(activity, _CacheLocation.EXTERNAL_CACHE_DIR);
     }
 
     public MultiPickerWrapper(android.support.v4.app.Fragment supportFragment, _CacheLocation cacheLocation) {
@@ -81,7 +84,7 @@ public class MultiPickerWrapper {
     }
 
     public MultiPickerWrapper(android.support.v4.app.Fragment supportFragment) {
-        this(supportFragment, _CacheLocation.EXTERNAL_STORAGE_APP_DIR);
+        this(supportFragment, _CacheLocation.EXTERNAL_CACHE_DIR);
     }
 
     public MultiPickerWrapper(Fragment fragment, _CacheLocation cacheLocation) {
@@ -95,7 +98,7 @@ public class MultiPickerWrapper {
     }
 
     public MultiPickerWrapper(Fragment fragment) {
-        this(fragment, _CacheLocation.EXTERNAL_STORAGE_APP_DIR);
+        this(fragment, _CacheLocation.EXTERNAL_CACHE_DIR);
     }
 
     public PickerUtilListener getPickerUtilListener() {
@@ -314,6 +317,7 @@ public class MultiPickerWrapper {
                     }
                     imagePicker.setImagePickerCallback(imagePickerCallback);
                     Uri uri = UCrop.getOutput(data);
+                    Log.d(TAG, "UCROP_PICKER_REQUEST UCrop.getOutput(data): " + uri.toString());
                     Intent intentData = new Intent();
                     intentData.putExtra("uris", new ArrayList(Arrays.asList(uri)));
                     imagePicker.submit(intentData);
@@ -334,6 +338,14 @@ public class MultiPickerWrapper {
                     cameraImagePicker.reinitialize(pickerPath);
                     cameraImagePicker.setImagePickerCallback(imagePickerCallback);
                     Uri uri = UCrop.getOutput(data);
+                    Log.d(TAG, "UCROP_CAMERA_REQUEST UCrop.getOutput(data): " + uri.toString());
+//                    try {
+//                        uri = FileProvider.getUriForFile(context,
+//                                com.kbeanie.multipicker.BuildConfig.APPLICATION_ID + ".multipicker.fileprovider",
+//                                new File(new URI(uri.toString())));
+//                    } catch (Exception e) {
+//                        e.printStackTrace();
+//                    }
                     Intent intentData = new Intent();
                     intentData.putExtra("uris", new ArrayList(Arrays.asList(uri)));
                     cameraImagePicker.submit(intentData);
@@ -375,14 +387,28 @@ public class MultiPickerWrapper {
                 pickerUtilListener.onImagesChosen(list);
             } else {
                 File imageFile = new File(list.get(0).getOriginalPath());
-                Uri sourceUri = Uri.fromFile(imageFile);
-//                String fileName = imageFile.getName();
-//                String tmp[] = fileName.split("\\.");
-//                String fileNameWithoutExtension = fileName.replace("." + tmp[tmp.length - 1], "");
-//                String destinationFilePath = imageFile.getParentFile().getAbsolutePath() + "/" + fileNameWithoutExtension + "_cropped" + "." + tmp[tmp.length - 1];
-//                Uri destinationUri = Uri.fromFile(new File(destinationFilePath));
-//                UCrop uCrop = UCrop.of(sourceUri, destinationUri)
-                UCrop uCrop = UCrop.of(sourceUri, sourceUri)
+                Log.d(TAG, "QueryUri: " + list.get(0).getQueryUri());
+                Uri sourceUri = null;
+//                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+//                    sourceUri = FileProvider.getUriForFile(context,
+//                            context.getPackageName() + ".multipicker.fileprovider",
+//                            imageFile);
+////                    tempFilePath = getNewFileLocation("jpeg", Environment.DIRECTORY_PICTURES);
+////                    File file = new File(tempFilePath);
+////                    uri = FileProvider.getUriForFile(getContext(), getFileProviderAuthority(), file);
+////                    Log.d(TAG, "takeVideoWithCamera: Temp Uri: " + uri.getPath());
+//                } else {
+//                    sourceUri = Uri.fromFile(imageFile);
+//                }
+                sourceUri = Uri.fromFile(imageFile);
+                String fileName = imageFile.getName();
+                String tmp[] = fileName.split("\\.");
+                String fileNameWithoutExtension = fileName.replace("." + tmp[tmp.length - 1], "");
+                String destinationFilePath = imageFile.getParentFile().getAbsolutePath() + "/" + fileNameWithoutExtension + "_cropped" + "." + tmp[tmp.length - 1];
+                pickerPath = destinationFilePath;
+                Uri destinationUri = Uri.fromFile(new File(destinationFilePath));
+                UCrop uCrop = UCrop.of(sourceUri, destinationUri)
+//                UCrop uCrop = UCrop.of(sourceUri, sourceUri)
                         .withOptions(uCropOptions);
 
                 if (setAspectRatio) {
@@ -575,7 +601,7 @@ public class MultiPickerWrapper {
     }
 
     public enum _CacheLocation {
-        EXTERNAL_STORAGE_PUBLIC_DIR(CacheLocation.EXTERNAL_STORAGE_PUBLIC_DIR),
+        //        EXTERNAL_STORAGE_PUBLIC_DIR(CacheLocation.EXTERNAL_STORAGE_PUBLIC_DIR),
         EXTERNAL_STORAGE_APP_DIR(CacheLocation.EXTERNAL_STORAGE_APP_DIR),
         EXTERNAL_CACHE_DIR(CacheLocation.EXTERNAL_CACHE_DIR),
         INTERNAL_APP_DIR(CacheLocation.INTERNAL_APP_DIR);
