@@ -1,13 +1,18 @@
 # MultiPickerWrapper
 [![Release](https://jitpack.io/v/noelchew/MultiPickerWrapper.svg)](https://jitpack.io/#noelchew/MultiPickerWrapper)
 
-Wrapper around [android-multipicker-library](https://github.com/coomar2841/android-multipicker-library) ([com.kbeanie:multipicker:1.1.1@aar](https://mvnrepository.com/artifact/com.kbeanie/multipicker/1.1.1))
+- pick single or multiple image/video
+- capture single image/video
+- crop image immediately after selection (optional)
+- library handles Runtime Permission
+- combination of the following libraries:
+    -  [android-multipicker-library](https://github.com/coomar2841/android-multipicker-library) ([com.kbeanie:multipicker:1.1.1@aar](https://mvnrepository.com/artifact/com.kbeanie/multipicker/1.1.1))
+    - [PermisoWrapper](https://github.com/NoelChew/PermisoWrapper) ([com.github.noelchew:PermisoWrapper:0.1.1](https://github.com/NoelChew/PermisoWrapper/releases/tag/0.1.1))
+    - [UCrop](https://github.com/Yalantis/uCrop) ([com.yalantis:ucrop:2.1.2](https://mvnrepository.com/artifact/com.yalantis/ucrop/2.1.2))
 
-Integrated with Runtime Permission library [PermisoWrapper](https://github.com/NoelChew/PermisoWrapper)
+####Optionally allows user to crop image taken or selected.
 
-PermisoWrapper provides convenient methods to handle permission request. It is a wrapper around the fantastic [Permiso](https://github.com/greysonp/permiso) library.
-
-Currently, this wrapper only supports image and video picking (and capturing).
+![screenshot1](https://github.com/NoelChew/MultiPickerWrapper/blob/master/screenshots/screenshot_1.png)
 
 # How to Use
 ## Activity
@@ -16,8 +21,24 @@ The Activity must extend MultiPickerWrapperAppCompatActivity:
 ```java
 public class DemoActivity extends MultiPickerWrapperAppCompatActivity {
     // example method to pick multiple image
-    private void pickMultipleImage() {
-        multiPickerWrapper.getPermissionAndPickMultipleImage();
+    private void pickCroppedImage() {
+    
+        // configure cropping activity UI to match current theme colour
+        UCrop.Options options = new UCrop.Options();
+        options.setStatusBarColor(ContextCompat.getColor(context, R.color.colorPrimaryDark));
+        options.setToolbarColor(ContextCompat.getColor(context, R.color.colorPrimary));
+        options.setCropFrameColor(ContextCompat.getColor(context, R.color.colorPrimaryDark));
+        options.setCropFrameStrokeWidth(PixelUtil.dpToPx(4));
+        options.setCropGridColor(ContextCompat.getColor(context, R.color.colorPrimary));
+        options.setCropGridStrokeWidth(PixelUtil.dpToPx(2));
+        options.setActiveWidgetColor(ContextCompat.getColor(context, R.color.colorPrimary));
+        options.setToolbarTitle("MultiPickerWrapper - Crop");
+        
+        // set rounded cropping guide
+        options.setOvalDimmedLayer(true);
+        
+        // set aspectRatioWidth and Height of 1 -> gives square rounded image cropping
+        multiPickerWrapper.getPermissionAndPickSingleImageAndCrop(options, 1, 1);
     }
 
     @Override
@@ -151,8 +172,10 @@ public class DemoSupportFragment extends MultiPickerWrapperSupportFragment {
 ```
 ## List of Predefined Methods
 - getPermissionAndPickSingleImage()
+- getPermissionAndPickSingleImageAndCrop()
 - getPermissionAndPickMultipleImage()
 - getPermissionAndTakePicture()
+- getPermissionAndTakePictureAndCrop()
 - getPermissionAndPickSingleVideo()
 - getPermissionAndTakeVideo()
 - getPermissionAndTakeVideoWithDurationLimit()
@@ -173,7 +196,24 @@ allprojects {
 Application level gradle:
 ```
 dependencies {
-    compile 'com.github.noelchew:MultiPickerWrapper:0.1.0'
+    compile 'com.github.noelchew:MultiPickerWrapper:0.1.1'
 }
 ```
 Note: do not add the jitpack.io repository under buildscript
+
+
+## Proguard
+```
+# UCrop
+-dontwarn com.yalantis.ucrop**
+-keep class com.yalantis.ucrop** { *; }
+-keep interface com.yalantis.ucrop** { *; }
+
+# OkHttp (included in UCrop library)
+-keepattributes Signature
+-keepattributes *Annotation*
+-keep class okhttp3.** { *; }
+-keep interface okhttp3.** { *; }
+-dontwarn okhttp3.**
+-dontwarn okio.**
+```
