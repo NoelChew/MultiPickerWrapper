@@ -24,7 +24,7 @@ import com.noelchew.multipickerwrapper.demo.R;
 import com.noelchew.multipickerwrapper.demo.utils.PixelUtil;
 import com.noelchew.multipickerwrapper.library.MultiPickerWrapper;
 import com.noelchew.multipickerwrapper.library.ui.MultiPickerWrapperFragment;
-import com.noelchew.ncutils.AlertDialogUtil;
+import com.noelchew.ncutils.alert.AlertDialogUtil;
 import com.noelchew.permisowrapper.PermisoWrapper;
 import com.yalantis.ucrop.UCrop;
 
