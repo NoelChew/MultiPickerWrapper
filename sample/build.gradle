@@ -8,8 +8,8 @@ android {
         applicationId "com.noelchew.multipickerwrapper.demo"
         minSdkVersion 16
         targetSdkVersion 27
-        versionCode 7
-        versionName "0.2.2"
+        versionCode 8
+        versionName "0.2.3"
     }
     buildTypes {
         release {
