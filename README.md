@@ -6,8 +6,8 @@
 - crop image immediately after selection (optional)
 - library handles Runtime Permission
 - combination of the following libraries:
-    -  [android-multipicker-library](https://github.com/coomar2841/android-multipicker-library) ([com.kbeanie:multipicker:1.1.2@aar](https://mvnrepository.com/artifact/com.kbeanie/multipicker/1.1.2))
-    - [PermisoWrapper](https://github.com/NoelChew/PermisoWrapper) ([com.github.noelchew:PermisoWrapper:0.1.2](https://github.com/NoelChew/PermisoWrapper/releases/tag/0.1.2))
+    -  [android-multipicker-library](https://github.com/coomar2841/android-multipicker-library) ([com.kbeanie:multipicker:1.1.31@aar](https://github.com/coomar2841/android-multipicker-library/releases/tag/v1.1.31))
+    - [PermisoWrapper](https://github.com/NoelChew/PermisoWrapper) ([com.github.noelchew:PermisoWrapper:0.2.0](https://github.com/NoelChew/PermisoWrapper/releases/tag/0.2.0))
     - [UCrop](https://github.com/Yalantis/uCrop) ([com.yalantis:ucrop:2.2.0](https://mvnrepository.com/artifact/com.yalantis/ucrop/2.2.0))
 
 ####Optionally allows user to crop image taken or selected.
@@ -188,6 +188,7 @@ Root level gradle:
 allprojects {
  repositories {
     jcenter()
+    google()
     maven { url "https://jitpack.io" }
  }
 }
@@ -196,7 +197,7 @@ allprojects {
 Application level gradle:[![Release](https://jitpack.io/v/noelchew/MultiPickerWrapper.svg)](https://jitpack.io/#noelchew/MultiPickerWrapper)
 ```
 dependencies {
-    compile 'com.github.noelchew:MultiPickerWrapper:x.y.z'
+    implementation 'com.github.noelchew:MultiPickerWrapper:x.y.z'
 }
 ```
 Note: do not add the jitpack.io repository under buildscript
