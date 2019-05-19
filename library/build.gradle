@@ -4,14 +4,13 @@ apply plugin: 'com.github.dcendents.android-maven'
 group='com.github.noelchew'
 
 android {
-    compileSdkVersion 27
-    buildToolsVersion '27.0.3'
+    compileSdkVersion 28
 
     defaultConfig {
         minSdkVersion 16
-        targetSdkVersion 27
-        versionCode 8
-        versionName "0.2.3"
+        targetSdkVersion 28
+        versionCode 9
+        versionName "0.2.4"
     }
     buildTypes {
         release {
@@ -24,9 +23,9 @@ android {
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     testImplementation 'junit:junit:4.12'
-    implementation 'com.android.support:appcompat-v7:27.0.2'
-    api 'com.kbeanie:multipicker:1.1.31@aar'
-    api 'com.github.noelchew:PermisoWrapper:0.2.0'
+    implementation 'com.android.support:appcompat-v7:28.0.0'
+    api 'com.kbeanie:multipicker:1.6@aar'
+    api 'com.github.noelchew:PermisoWrapper:0.2.4'
     api 'com.greysonparrelli.permiso:permiso:0.3.0'
     api 'com.yalantis:ucrop:2.2.0'
 }

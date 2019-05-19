@@ -7,15 +7,22 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.text.TextUtils;
 
+import com.kbeanie.multipicker.api.AudioPicker;
 import com.kbeanie.multipicker.api.CacheLocation;
 import com.kbeanie.multipicker.api.CameraImagePicker;
 import com.kbeanie.multipicker.api.CameraVideoPicker;
+import com.kbeanie.multipicker.api.FilePicker;
 import com.kbeanie.multipicker.api.ImagePicker;
 import com.kbeanie.multipicker.api.Picker;
 import com.kbeanie.multipicker.api.VideoPicker;
+import com.kbeanie.multipicker.api.callbacks.AudioPickerCallback;
+import com.kbeanie.multipicker.api.callbacks.FilePickerCallback;
 import com.kbeanie.multipicker.api.callbacks.ImagePickerCallback;
 import com.kbeanie.multipicker.api.callbacks.VideoPickerCallback;
+import com.kbeanie.multipicker.api.entity.ChosenAudio;
+import com.kbeanie.multipicker.api.entity.ChosenFile;
 import com.kbeanie.multipicker.api.entity.ChosenImage;
 import com.kbeanie.multipicker.api.entity.ChosenVideo;
 import com.noelchew.permisowrapper.PermisoWrapper;
@@ -40,6 +47,8 @@ public class MultiPickerWrapper {
     private VideoPicker videoPicker;
     private CameraImagePicker cameraImagePicker;
     private CameraVideoPicker cameraVideoPicker;
+    private FilePicker filePicker;
+    private AudioPicker audioPicker;
     private PickerUtilListener pickerUtilListener;
     public String pickerPath;
     private Context context;
@@ -58,11 +67,16 @@ public class MultiPickerWrapper {
     private float aspectRatioHeight = 1;
     private int videoDurationLimit = 15;
 
+    // filePicker param
+    private String filePickerMimeType;
+
     public MultiPickerWrapper(Activity activity, _CacheLocation cacheLocation) {
         imagePicker = new ImagePicker(activity);
         videoPicker = new VideoPicker(activity);
         cameraImagePicker = new CameraImagePicker(activity);
         cameraVideoPicker = new CameraVideoPicker(activity);
+        filePicker = new FilePicker(activity);
+        audioPicker = new AudioPicker(activity);
         this.context = activity;
         this.activity = activity;
         this.cacheLocation = cacheLocation;
@@ -77,6 +91,8 @@ public class MultiPickerWrapper {
         videoPicker = new VideoPicker(supportFragment);
         cameraImagePicker = new CameraImagePicker(supportFragment);
         cameraVideoPicker = new CameraVideoPicker(supportFragment);
+        filePicker = new FilePicker(supportFragment);
+        audioPicker = new AudioPicker(supportFragment);
         this.context = supportFragment.getActivity();
         this.supportFragment = supportFragment;
         this.cacheLocation = cacheLocation;
@@ -91,6 +107,8 @@ public class MultiPickerWrapper {
         videoPicker = new VideoPicker(fragment);
         cameraImagePicker = new CameraImagePicker(fragment);
         cameraVideoPicker = new CameraVideoPicker(fragment);
+        filePicker = new FilePicker(fragment);
+        audioPicker = new AudioPicker(fragment);
         this.context = fragment.getActivity();
         this.fragment = fragment;
         this.cacheLocation = cacheLocation;
@@ -165,6 +183,34 @@ public class MultiPickerWrapper {
         PermisoWrapper.getPermissionTakeVideo(context, takeVideoWithDurationLimitPermissionListener);
     }
 
+    public void getPermissionAndPickSingleFile() {
+        getPermissionAndPickSingleFile("*/*");
+    }
+
+    public void getPermissionAndPickSingleFile(String filePickerMimeType) {
+        this.filePickerMimeType = filePickerMimeType;
+        PermisoWrapper.getPermissionPickFolderFile(context, pickSingleFilePermissionListener);
+    }
+
+    public void getPermissionAndPickMultipleFile() {
+        getPermissionAndPickMultipleFile("*/*");
+    }
+
+    public void getPermissionAndPickMultipleFile(String filePickerMimeType) {
+        this.filePickerMimeType = filePickerMimeType;
+        PermisoWrapper.getPermissionPickFolderFile(context, pickMultipleFilePermissionListener);
+    }
+
+    public void getPermissionAndPickAudio() {
+        PermisoWrapper.getPermissionPickAudio(context, pickSingleAudioPermissionListener);
+    }
+
+    public void getPermissionAndPickMultipleAudio() {
+        PermisoWrapper.getPermissionPickAudio(context, pickMultipleAudioPermissionListener);
+    }
+
+    // ----------------- //
+
     private void pickSingleImage() {
         imagePicker.shouldGenerateMetadata(false);
         imagePicker.shouldGenerateThumbnails(false);
@@ -237,6 +283,42 @@ public class MultiPickerWrapper {
         cameraVideoPicker.setCacheLocation(cacheLocation.getValue());
         cameraVideoPicker.setVideoPickerCallback(videoPickerCallback);
         pickerPath = cameraVideoPicker.pickVideo();
+    }
+
+    public void pickSingleFile() {
+        if (!TextUtils.isEmpty(filePickerMimeType)) {
+            filePicker.setMimeType(filePickerMimeType);
+        } else {
+            filePicker.setMimeType("");
+        }
+        filePicker.setCacheLocation(cacheLocation.getValue());
+        filePicker.setFilePickerCallback(filePickerCallback);
+        filePicker.pickFile();
+    }
+
+    public void pickMultipleFile() {
+        if (!TextUtils.isEmpty(filePickerMimeType)) {
+            filePicker.setMimeType(filePickerMimeType);
+        } else {
+            filePicker.setMimeType("");
+        }
+        filePicker.allowMultiple();
+        filePicker.setCacheLocation(cacheLocation.getValue());
+        filePicker.setFilePickerCallback(filePickerCallback);
+        filePicker.pickFile();
+    }
+
+    public void pickSingleAudio() {
+        audioPicker.setCacheLocation(cacheLocation.getValue());
+        audioPicker.setAudioPickerCallback(audioPickerCallback);
+        audioPicker.pickAudio();
+    }
+
+    public void pickMultipleAudio() {
+        audioPicker.allowMultiple();
+        audioPicker.setCacheLocation(cacheLocation.getValue());
+        audioPicker.setAudioPickerCallback(audioPickerCallback);
+        audioPicker.pickAudio();
     }
 
     public boolean onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -341,6 +423,36 @@ public class MultiPickerWrapper {
                     cameraImagePicker.submit(intentData);
                 }
                 return true;
+            case Picker.PICK_FILE:
+                if (resultCode == Activity.RESULT_OK) {
+                    if (filePicker == null) {
+                        if (activity != null) {
+                            filePicker = new FilePicker(activity);
+                        } else if (supportFragment != null) {
+                            filePicker = new FilePicker(supportFragment);
+                        } else if (fragment != null) {
+                            filePicker = new FilePicker(fragment);
+                        }
+                        filePicker.setFilePickerCallback(filePickerCallback);
+                    }
+                    filePicker.submit(data);
+                }
+                return true;
+            case Picker.PICK_AUDIO:
+                if (resultCode == Activity.RESULT_OK) {
+                    if (audioPicker == null) {
+                        if (activity != null) {
+                            audioPicker = new AudioPicker(activity);
+                        } else if (supportFragment != null) {
+                            audioPicker = new AudioPicker(supportFragment);
+                        } else if (fragment != null) {
+                            audioPicker = new AudioPicker(fragment);
+                        }
+                        audioPicker.setAudioPickerCallback(audioPickerCallback);
+                    }
+                    audioPicker.submit(data);
+                }
+                return true;
         }
         return false;
     }
@@ -429,6 +541,44 @@ public class MultiPickerWrapper {
                 throw new RuntimeException("PickerUtilListener is not set.");
             }
             pickerUtilListener.onVideosChosen(list);
+        }
+
+        @Override
+        public void onError(String s) {
+            if (pickerUtilListener == null) {
+                throw new RuntimeException("PickerUtilListener is not set.");
+            }
+            pickerUtilListener.onError(s);
+        }
+    };
+
+    private FilePickerCallback filePickerCallback = new FilePickerCallback() {
+
+        @Override
+        public void onFilesChosen(List<ChosenFile> list) {
+            if (pickerUtilListener == null) {
+                throw new RuntimeException("PickerUtilListener is not set.");
+            }
+            pickerUtilListener.onFilesChosen(list);
+        }
+
+        @Override
+        public void onError(String s) {
+            if (pickerUtilListener == null) {
+                throw new RuntimeException("PickerUtilListener is not set.");
+            }
+            pickerUtilListener.onError(s);
+        }
+    };
+
+    private AudioPickerCallback audioPickerCallback = new AudioPickerCallback() {
+
+        @Override
+        public void onAudiosChosen(List<ChosenAudio> list) {
+            if (pickerUtilListener == null) {
+                throw new RuntimeException("PickerUtilListener is not set.");
+            }
+            pickerUtilListener.onAudiosChosen(list);
         }
 
         @Override
@@ -569,6 +719,66 @@ public class MultiPickerWrapper {
 
     };
 
+    private PermisoWrapper.PermissionListener pickSingleFilePermissionListener = new PermisoWrapper.PermissionListener() {
+        @Override
+        public void onPermissionGranted() {
+            pickSingleFile();
+        }
+
+        @Override
+        public void onPermissionDenied() {
+            if (pickerUtilListener == null) {
+                throw new RuntimeException("PickerUtilListener is not set.");
+            }
+            pickerUtilListener.onPermissionDenied();
+        }
+    };
+
+    private PermisoWrapper.PermissionListener pickMultipleFilePermissionListener = new PermisoWrapper.PermissionListener() {
+        @Override
+        public void onPermissionGranted() {
+            pickMultipleFile();
+        }
+
+        @Override
+        public void onPermissionDenied() {
+            if (pickerUtilListener == null) {
+                throw new RuntimeException("PickerUtilListener is not set.");
+            }
+            pickerUtilListener.onPermissionDenied();
+        }
+    };
+
+    private PermisoWrapper.PermissionListener pickSingleAudioPermissionListener = new PermisoWrapper.PermissionListener() {
+        @Override
+        public void onPermissionGranted() {
+            pickSingleAudio();
+        }
+
+        @Override
+        public void onPermissionDenied() {
+            if (pickerUtilListener == null) {
+                throw new RuntimeException("PickerUtilListener is not set.");
+            }
+            pickerUtilListener.onPermissionDenied();
+        }
+    };
+
+    private PermisoWrapper.PermissionListener pickMultipleAudioPermissionListener = new PermisoWrapper.PermissionListener() {
+        @Override
+        public void onPermissionGranted() {
+            pickMultipleAudio();
+        }
+
+        @Override
+        public void onPermissionDenied() {
+            if (pickerUtilListener == null) {
+                throw new RuntimeException("PickerUtilListener is not set.");
+            }
+            pickerUtilListener.onPermissionDenied();
+        }
+    };
+
     // --- Permiso Callback --- end ---
 
     public interface PickerUtilListener {
@@ -577,6 +787,10 @@ public class MultiPickerWrapper {
         void onImagesChosen(List<ChosenImage> list);
 
         void onVideosChosen(List<ChosenVideo> list);
+
+        void onAudiosChosen(List<ChosenAudio> list);
+
+        void onFilesChosen(List<ChosenFile> list);
 
         void onError(String s);
     }
