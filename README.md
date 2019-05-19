@@ -1,9 +1,10 @@
 # MultiPickerWrapper
 [![Release](https://jitpack.io/v/noelchew/MultiPickerWrapper.svg)](https://jitpack.io/#noelchew/MultiPickerWrapper)
 
-- pick single or multiple image/video
+- pick single or multiple image/video/audio
 - capture single image/video
 - crop image immediately after selection (optional)
+- pick single/multiple file with specified mime type
 - library handles Runtime Permission
 - combination of the following libraries:
     -  [android-multipicker-library](https://github.com/coomar2841/android-multipicker-library) ([com.kbeanie:multipicker:1.1.31@aar](https://github.com/coomar2841/android-multipicker-library/releases/tag/v1.1.31))
