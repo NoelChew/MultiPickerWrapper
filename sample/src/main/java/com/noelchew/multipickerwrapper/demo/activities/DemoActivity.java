@@ -2,7 +2,6 @@ package com.noelchew.multipickerwrapper.demo.activities;
 
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
@@ -16,9 +15,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.kbeanie.multipicker.api.entity.ChosenAudio;
+import com.kbeanie.multipicker.api.entity.ChosenFile;
 import com.kbeanie.multipicker.api.entity.ChosenImage;
 import com.kbeanie.multipicker.api.entity.ChosenVideo;
 import com.noelchew.multipickerwrapper.demo.R;
+import com.noelchew.multipickerwrapper.demo.utils.FileIntentUtil;
 import com.noelchew.multipickerwrapper.demo.utils.PixelUtil;
 import com.noelchew.multipickerwrapper.library.MultiPickerWrapper;
 import com.noelchew.multipickerwrapper.library.ui.MultiPickerWrapperAppCompatActivity;
@@ -41,7 +43,6 @@ public class DemoActivity extends MultiPickerWrapperAppCompatActivity {
     Button btnCheckPermissions;
 
     String filePath;
-    boolean isVideo = false;
 
     @Override
     protected MultiPickerWrapper.PickerUtilListener getMultiPickerWrapperListener() {
@@ -56,10 +57,8 @@ public class DemoActivity extends MultiPickerWrapperAppCompatActivity {
 
         @Override
         public void onImagesChosen(List<ChosenImage> list) {
-            final Uri uri = Uri.fromFile(new File(list.get(0).getOriginalPath()));
             filePath = list.get(0).getOriginalPath();
             tvData.setText(getString(R.string.show_data) + filePath);
-            isVideo = false;
             AlertDialogUtil.showAlertDialogWithSelections(context,
                     "Image Selected:",
                     new ArrayList<>(Arrays.asList(new String[]{"Show", "Cancel"})),
@@ -67,23 +66,17 @@ public class DemoActivity extends MultiPickerWrapperAppCompatActivity {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             if (which == 0) {
-                                Intent intent = new Intent();
-                                intent.setAction(Intent.ACTION_VIEW);
-                                intent.setDataAndType(uri, "image/*");
-                                startActivity(intent);
+                                FileIntentUtil.openFile(DemoActivity.this, filePath);
                             }
                         }
                     });
-
-            Glide.with(context).load(uri).into(imageView);
+            Glide.with(context).load(list.get(0).getOriginalPath()).into(imageView);
         }
 
         @Override
         public void onVideosChosen(List<ChosenVideo> list) {
-            final Uri uri = Uri.fromFile(new File(list.get(0).getOriginalPath()));
             filePath = list.get(0).getOriginalPath();
             tvData.setText(getString(R.string.show_data) + filePath);
-            isVideo = true;
             AlertDialogUtil.showAlertDialogWithSelections(context,
                     "Video Selected:",
                     new ArrayList<>(Arrays.asList(new String[]{"Show", "Cancel"})),
@@ -91,15 +84,65 @@ public class DemoActivity extends MultiPickerWrapperAppCompatActivity {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             if (which == 0) {
-                                Intent intent = new Intent();
-                                intent.setAction(Intent.ACTION_VIEW);
-                                intent.setDataAndType(uri, "video/*");
-                                context.startActivity(intent);
+                                FileIntentUtil.openFile(DemoActivity.this, filePath);
+                            }
+                        }
+                    });
+            Glide.with(context).load(list.get(0).getPreviewThumbnail()).into(imageView);
+        }
+
+        @Override
+        public void onAudiosChosen(List<ChosenAudio> list) {
+            // multiple audio is supported here
+            String text = "";
+            ArrayList<Uri> uriArrayList = new ArrayList<>();
+            ArrayList<String> pathArrayList = new ArrayList<>();
+            for (ChosenAudio chosenAudio : list) {
+                uriArrayList.add(Uri.fromFile(new File(chosenAudio.getOriginalPath())));
+                filePath = chosenAudio.getOriginalPath();
+                pathArrayList.add(filePath);
+                text += filePath + "\n";
+            }
+            final ArrayList<String> _pathArrayList = pathArrayList;
+            tvData.setText(getString(R.string.show_data_multiple) + text + "\n" + getString(R.string.click_to_show_last_item));
+            AlertDialogUtil.showAlertDialogWithSelections(context,
+                    "Audio Selected:",
+                    pathArrayList,
+                    new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+
+                            FileIntentUtil.openFile(DemoActivity.this, _pathArrayList.get(which));
+
+                        }
+                    });
+            imageView.setImageDrawable(null);
+        }
+
+        @Override
+        public void onFilesChosen(List<ChosenFile> list) {
+            filePath = list.get(0).getOriginalPath();
+            tvData.setText(getString(R.string.show_data) + filePath);
+            AlertDialogUtil.showAlertDialogWithSelections(context,
+                    "File Selected:",
+                    new ArrayList<>(Arrays.asList(new String[]{"Show", "Cancel"})),
+                    new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            if (which == 0) {
+//                                Intent intent = new Intent(Intent.ACTION_VIEW);
+//                                intent.setData(newUri);
+//                                intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+//                                Intent intentChooser = Intent.createChooser(intent, "Choose an application to open with:");
+//                                startActivity(intentChooser);
+
+                                FileIntentUtil.openFile(DemoActivity.this, filePath);
                             }
                         }
                     });
 
-            Glide.with(context).load(list.get(0).getPreviewThumbnail()).into(imageView);
+            imageView.setImageDrawable(null);
+
         }
 
         @Override
@@ -142,8 +185,8 @@ public class DemoActivity extends MultiPickerWrapperAppCompatActivity {
         public void onClick(View v) {
 
             AlertDialogUtil.showAlertDialogWithSelections(context,
-                    "Do you want to select image or video?",
-                    new ArrayList<>(Arrays.asList(new String[]{"Image", "Image + Crop", "Video"})),
+                    "What do you want to pick?",
+                    new ArrayList<>(Arrays.asList(new String[]{"Image", "Image + Crop", "Video", "Audio", "File"})),
                     new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
@@ -224,6 +267,47 @@ public class DemoActivity extends MultiPickerWrapperAppCompatActivity {
                                                 }
                                             }
                                         });
+                            } else if (which == 3) {
+                                AlertDialogUtil.showAlertDialogWithSelections(context,
+                                        "Audio",
+                                        new ArrayList<>(Arrays.asList(new String[]{"Single Audio", "Multiple Audio"})),
+                                        new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialog, int which) {
+                                                switch (which) {
+                                                    case 0:
+                                                        // pick single audio file
+                                                        multiPickerWrapper.getPermissionAndPickAudio();
+                                                        break;
+
+                                                    case 1:
+                                                        // pick multiple audio file
+                                                        multiPickerWrapper.getPermissionAnd();
+                                                        break;
+                                                }
+                                            }
+                                        });
+                            } else if (which == 4) {
+                                AlertDialogUtil.showAlertDialogWithSelections(context,
+                                        "File",
+                                        new ArrayList<>(Arrays.asList(new String[]{"PDF", "Any File"})),
+                                        new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialog, int which) {
+                                                switch (which) {
+                                                    case 0:
+                                                        // pick PDF file
+                                                        // get list of mime type here: http://androidxref.com/4.4.4_r1/xref/frameworks/base/media/java/android/media/MediaFile.java#174
+                                                        multiPickerWrapper.getPermissionAndPickSingleFile("application/pdf");
+                                                        break;
+
+                                                    case 1:
+                                                        // pick any file
+                                                        multiPickerWrapper.getPermissionAndPickSingleFile();
+                                                        break;
+                                                }
+                                            }
+                                        });
                             }
                         }
                     });
@@ -234,18 +318,7 @@ public class DemoActivity extends MultiPickerWrapperAppCompatActivity {
         @Override
         public void onClick(View v) {
             if (!TextUtils.isEmpty(filePath)) {
-                Uri uri = Uri.fromFile(new File(filePath));
-                if (!isVideo) {
-                    Intent intent = new Intent();
-                    intent.setAction(Intent.ACTION_VIEW);
-                    intent.setDataAndType(uri, "image/*");
-                    startActivity(intent);
-                } else {
-                    Intent intent = new Intent();
-                    intent.setAction(Intent.ACTION_VIEW);
-                    intent.setDataAndType(uri, "video/*");
-                    startActivity(intent);
-                }
+                FileIntentUtil.openFile(DemoActivity.this, filePath);
             }
         }
     };

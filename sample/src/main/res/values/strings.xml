@@ -1,4 +1,6 @@
 <resources>
     <string name="app_name">MultiPickerWrapper - Demo</string>
     <string name="show_data">Click here to show:\u0020</string>
+    <string name="show_data_multiple">All Data:\u0020</string>
+    <string name="click_to_show_last_item">Click here to show last</string>
 </resources>
