@@ -10,21 +10,32 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="8dp"
-        android:text="Activity" />
+        android:text="AppCompatActivity"
+        android:textAllCaps="false" />
+
+    <Button
+        android:id="@+id/button_activity_demo_multipickerwrapper_appcompat"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="8dp"
+        android:text="MultiPickerWrapperAppCompatActivity"
+        android:textAllCaps="false" />
 
     <Button
         android:id="@+id/button_fragment_demo"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="8dp"
-        android:text="Fragment" />
+        android:text="MultiPickerWrapperFragment + PermisoActivity"
+        android:textAllCaps="false" />
 
     <Button
         android:id="@+id/button_support_fragment_demo"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="8dp"
-        android:text="Support Fragment" />
+        android:text="MultiPickerWrapperSupportFragment + AppCompatActivity"
+        android:textAllCaps="false" />
 
 
 </LinearLayout>

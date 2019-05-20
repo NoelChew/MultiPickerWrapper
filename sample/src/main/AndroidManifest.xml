@@ -29,13 +29,18 @@
             android:screenOrientation="portrait" />
 
         <activity
+            android:name=".activities.DemoMultiPickerWrapperAppCompatActivity"
+            android:label="WrapperAct"
+            android:screenOrientation="portrait" />
+
+        <activity
             android:name=".activities.DemoFragmentActivity"
-            android:label="Fragment"
+            android:label="WrapperFrag + PermisoAct"
             android:screenOrientation="portrait" />
 
         <activity
             android:name=".activities.DemoSupportFragmentActivity"
-            android:label="Support Fragment"
+            android:label="WrapperSFrag + Act"
             android:screenOrientation="portrait" />
     </application>
 

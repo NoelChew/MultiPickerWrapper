@@ -15,7 +15,7 @@ import com.noelchew.multipickerwrapper.demo.fragments.DemoFragment;
  * Created by noelchew on 16/08/2016.
  */
     // Note that this activity extends PermisoActivity
-    // If you don't want to extend PermisoActivity, please refer to the example in DemoFragmentSupportActivity
+    // If you don't want to extend PermisoActivity, please refer to the example in DemoSupportFragmentActivity
 public class DemoFragmentActivity extends PermisoActivity {
 
     private Context context;
