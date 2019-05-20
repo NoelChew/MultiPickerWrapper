@@ -16,7 +16,7 @@ import com.noelchew.multipickerwrapper.demo.R;
  */
 public class MainActivity extends AppCompatActivity {
     private Context context;
-    private Button btnActivity, btnFragment, btnSupportFragment;
+    private Button btnActivity, btnMultiPickerWrapperActivity, btnFragment, btnSupportFragment;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -24,10 +24,12 @@ public class MainActivity extends AppCompatActivity {
         context = this;
         setContentView(R.layout.activity_main);
         btnActivity = (Button) findViewById(R.id.button_activity_demo);
+        btnMultiPickerWrapperActivity = (Button) findViewById(R.id.button_activity_demo_multipickerwrapper_appcompat);
         btnFragment = (Button) findViewById(R.id.button_fragment_demo);
         btnSupportFragment = (Button) findViewById(R.id.button_support_fragment_demo);
 
         btnActivity.setOnClickListener(btnActivityOnClickListener);
+        btnMultiPickerWrapperActivity.setOnClickListener(btnMultiPickerWrapperActivityOnClickListener);
         btnFragment.setOnClickListener(btnFragmentOnClickListener);
         btnSupportFragment.setOnClickListener(btnSupportFragmentOnClickListener);
     }
@@ -36,6 +38,13 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onClick(View v) {
             startActivity(new Intent(context, DemoActivity.class));
+        }
+    };
+
+    private View.OnClickListener btnMultiPickerWrapperActivityOnClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            startActivity(new Intent(context, DemoMultiPickerWrapperAppCompatActivity.class));
         }
     };
 

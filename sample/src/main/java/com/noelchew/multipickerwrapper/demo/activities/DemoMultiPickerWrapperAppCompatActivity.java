@@ -1,11 +1,9 @@
-package com.noelchew.multipickerwrapper.demo.fragments;
+package com.noelchew.multipickerwrapper.demo.activities;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
@@ -18,14 +16,11 @@ import com.kbeanie.multipicker.api.entity.ChosenVideo;
 import com.noelchew.multipickerwrapper.demo.R;
 import com.noelchew.multipickerwrapper.demo.helper.ActionHelper;
 import com.noelchew.multipickerwrapper.library.MultiPickerWrapper;
-import com.noelchew.multipickerwrapper.library.ui.MultiPickerWrapperFragment;
+import com.noelchew.multipickerwrapper.library.ui.MultiPickerWrapperAppCompatActivity;
 
 import java.util.List;
 
-/**
- * Created by noelchew on 16/08/2016.
- */
-public class DemoFragment extends MultiPickerWrapperFragment {
+public class DemoMultiPickerWrapperAppCompatActivity extends MultiPickerWrapperAppCompatActivity {
 
     Context context;
 
@@ -71,16 +66,16 @@ public class DemoFragment extends MultiPickerWrapperFragment {
         }
     };
 
-    @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.layout_demo, null);
-        context = getActivity();
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        context = DemoMultiPickerWrapperAppCompatActivity.this;
+        setContentView(R.layout.activity_demo);
 
-        relativeLayoutImage = (RelativeLayout) view.findViewById(R.id.relative_layout_image);
-        imageView = (ImageView) view.findViewById(R.id.image_view);
-        tvData = (TextView) view.findViewById(R.id.text_view_selected_data);
-        btnCheckPermissions = (Button) view.findViewById(R.id.button_check_permissions);
+        relativeLayoutImage = (RelativeLayout) findViewById(R.id.relative_layout_image);
+        imageView = (ImageView) findViewById(R.id.image_view);
+        tvData = (TextView) findViewById(R.id.text_view_selected_data);
+        btnCheckPermissions = (Button) findViewById(R.id.button_check_permissions);
 
         relativeLayoutImage.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -102,7 +97,18 @@ public class DemoFragment extends MultiPickerWrapperFragment {
             }
         });
 
-        return view;
+
+        getSupportActionBar().setHomeButtonEnabled(true);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            finish();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
 }
