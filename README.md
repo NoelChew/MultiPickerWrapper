@@ -123,14 +123,11 @@ public class DemoActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // * must add these lines for multipickerwrapper library --- begin ---- *
         Permiso.getInstance().setActivity(this);
         multiPickerWrapper = new MultiPickerWrapper(this, cacheLocation);
-        // * must add these lines for multipickerwrapper library --- end ---- *
 
     }
     
-    // * must add these lines for multipickerwrapper library --- begin ---- *
     @Override
     public void onResume() {
         super.onResume();
@@ -173,8 +170,6 @@ public class DemoActivity extends AppCompatActivity {
         }
         super.onActivityResult(requestCode, resultCode, data);
     }
-    // * must add these lines for multipickerwrapper library --- end ---- *
-
 }
 
 ```
