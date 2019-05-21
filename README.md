@@ -7,8 +7,8 @@
 - pick single/multiple file with specified mime type
 - library handles Runtime Permission
 - combination of the following libraries:
-    -  [android-multipicker-library](https://github.com/coomar2841/android-multipicker-library) ([com.kbeanie:multipicker:1.1.31@aar](https://github.com/coomar2841/android-multipicker-library/releases/tag/v1.1.31))
-    - [PermisoWrapper](https://github.com/NoelChew/PermisoWrapper) ([com.github.noelchew:PermisoWrapper:0.2.0](https://github.com/NoelChew/PermisoWrapper/releases/tag/0.2.0))
+    -  [android-multipicker-library](https://github.com/coomar2841/android-multipicker-library) ([com.kbeanie:multipicker:1.6@aar](https://github.com/coomar2841/android-multipicker-library/releases/tag/v1.6))
+    - [PermisoWrapper](https://github.com/NoelChew/PermisoWrapper) ([com.github.noelchew:PermisoWrapper:0.2.4](https://github.com/NoelChew/PermisoWrapper/releases/tag/0.2.4))
     - [UCrop](https://github.com/Yalantis/uCrop) ([com.yalantis:ucrop:2.2.0](https://mvnrepository.com/artifact/com.yalantis/ucrop/2.2.0))
 
 #### Optionally allows user to crop image taken or selected.
