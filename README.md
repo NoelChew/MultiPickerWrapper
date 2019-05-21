@@ -11,16 +11,16 @@
     - [PermisoWrapper](https://github.com/NoelChew/PermisoWrapper) ([com.github.noelchew:PermisoWrapper:0.2.0](https://github.com/NoelChew/PermisoWrapper/releases/tag/0.2.0))
     - [UCrop](https://github.com/Yalantis/uCrop) ([com.yalantis:ucrop:2.2.0](https://mvnrepository.com/artifact/com.yalantis/ucrop/2.2.0))
 
-####Optionally allows user to crop image taken or selected.
+#### Optionally allows user to crop image taken or selected.
 
 ![screenshot1](https://github.com/NoelChew/MultiPickerWrapper/blob/master/screenshots/screenshot_1.png)
 
 # How to Use
 ## Activity
-The Activity must extend MultiPickerWrapperAppCompatActivity:
+The Activity can either extend MultiPickerWrapperAppCompatActivity:
 
 ```java
-public class DemoActivity extends MultiPickerWrapperAppCompatActivity {
+public class DemoMultiPickerWrapperAppCompatActivity extends MultiPickerWrapperAppCompatActivity {
     // example method to pick multiple image
     private void pickCroppedImage() {
     
@@ -80,8 +80,107 @@ public class DemoActivity extends MultiPickerWrapperAppCompatActivity {
 
 ```
 
+or override the following methods in Activity:
+```java
+public class DemoActivity extends AppCompatActivity {
+
+    // define multiPickerWrapper and it's callback
+    private MultiPickerWrapper multiPickerWrapper;
+    private MultiPickerWrapper._CacheLocation cacheLocation = MultiPickerWrapper._CacheLocation.EXTERNAL_CACHE_DIR;
+    MultiPickerWrapper.PickerUtilListener multiPickerWrapperListener = new MultiPickerWrapper.PickerUtilListener() {
+        @Override
+        public void onPermissionDenied() {
+            // do something here
+        }
+
+        @Override
+        public void onImagesChosen(List<ChosenImage> list) {
+            // do something here
+        }
+
+        @Override
+        public void onVideosChosen(List<ChosenVideo> list) {
+            // do something here
+        }
+
+        @Override
+        public void onAudiosChosen(List<ChosenAudio> list) {
+            // do something here
+        }
+
+        @Override
+        public void onFilesChosen(List<ChosenFile> list) {
+            // do something here
+        }
+
+        @Override
+        public void onError(String s) {
+            // do something here
+        }
+    };
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        // * must add these lines for multipickerwrapper library --- begin ---- *
+        Permiso.getInstance().setActivity(this);
+        multiPickerWrapper = new MultiPickerWrapper(this, cacheLocation);
+        // * must add these lines for multipickerwrapper library --- end ---- *
+
+    }
+    
+    // * must add these lines for multipickerwrapper library --- begin ---- *
+    @Override
+    public void onResume() {
+        super.onResume();
+        Permiso.getInstance().setActivity(this);
+        if (multiPickerWrapper.getPickerUtilListener() == null) {
+            multiPickerWrapper.setPickerUtilListener(multiPickerWrapperListener);
+        }
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        // You have to save path in case your activity is killed.
+        // In such a scenario, you will need to re-initialize the CameraImagePicker
+        outState.putString("picker_path", multiPickerWrapper.pickerPath);
+        super.onSaveInstanceState(outState);
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        // After Activity recreate, you need to re-initialize these
+        // two values to be able to re-initialize CameraImagePicker
+        if (savedInstanceState != null) {
+            if (savedInstanceState.containsKey("picker_path")) {
+                multiPickerWrapper.pickerPath = savedInstanceState.getString("picker_path");
+            }
+        }
+        super.onRestoreInstanceState(savedInstanceState);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        Permiso.getInstance().onRequestPermissionResult(requestCode, permissions, grantResults);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (multiPickerWrapper.onActivityResult(requestCode, resultCode, data)) {
+            return;
+        }
+        super.onActivityResult(requestCode, resultCode, data);
+    }
+    // * must add these lines for multipickerwrapper library --- end ---- *
+
+}
+
+```
+
 ## Fragment or SupportFragment
-For Fragment or SupportFragment, the Activity containing the fragment must extend PermisoActivity:
+For Fragment or SupportFragment, the Activity containing the fragment can either extend PermisoActivity:
 
 ```java
 public class DemoSupportFragmentActivity extends PermisoActivity {
@@ -180,6 +279,10 @@ public class DemoSupportFragment extends MultiPickerWrapperSupportFragment {
 - getPermissionAndPickSingleVideo()
 - getPermissionAndTakeVideo()
 - getPermissionAndTakeVideoWithDurationLimit()
+- getPermissionAndPickSingleFile()
+- getPermissionAndPickMultipleFile()
+- getPermissionAndPickAudio()
+- getPermissionAndPickMultipleAudio()
 
 ## Integration
 This library is hosted by jitpack.io.
